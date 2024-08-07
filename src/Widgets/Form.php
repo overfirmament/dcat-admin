@@ -84,6 +84,7 @@ use Illuminate\Validation\Validator;
  * @method Field\SelectTable selectTable($column, $label = '')
  * @method Field\MultipleSelectTable multipleSelectTable($column, $label = '')
  * @method Field\Button button(string $html = null)
+ * @method Field\LimitTextarea limitTextarea($column, $label = '')
  */
 class Form implements Renderable
 {
