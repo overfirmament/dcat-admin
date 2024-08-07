@@ -269,4 +269,18 @@ class Tree extends Field
 
         return parent::render();
     }
+
+    /**
+     * 有数据时加载时展开选中节点.
+     *
+     * @param  bool  $expand
+     *
+     * @return Tree
+     */
+    public function expandSelectOnload(bool $expand = true)
+    {
+        $this->options['core']['expand_selected_onload'] = $expand;
+
+        return $this;
+    }
 }

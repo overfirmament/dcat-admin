@@ -4,6 +4,7 @@ namespace Dcat\Admin\Form\Field;
 
 use Dcat\Admin\Support\Helper;
 use Dcat\Admin\Widgets\Checkbox as WidgetCheckbox;
+use Illuminate\Support\Arr;
 
 class Checkbox extends MultipleSelect
 {
@@ -114,5 +115,20 @@ class Checkbox extends MultipleSelect
         $this->addVariables(['canCheckAll' => $this->canCheckAll]);
 
         return WidgetCheckbox::make('_check_all_', [__('admin.all')]);
+    }
+
+
+    /**
+     * @param $input
+     * @param $column
+     *
+     * @return array
+     */
+    protected function sanitizeInput($input, $column): array
+    {
+        $value = Arr::get($input, $column);
+        Arr::set($input, $column, array_filter($value, fn($v) => !is_null($v)));
+
+        return $input;
     }
 }

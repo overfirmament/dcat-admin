@@ -338,11 +338,13 @@ class JsonResponse implements Arrayable
             return $this->withValidation($exception->errors());
         }
 
+        $message = config('app.debug')
+            ? sprintf('[%s] %s', get_class($exception), $exception->getMessage())
+            : $exception->getMessage();
+
         return $this
             ->status(false)
-            ->error(
-                sprintf('[%s] %s', get_class($exception), $exception->getMessage())
-            );
+            ->error($message);
     }
 
     /**
