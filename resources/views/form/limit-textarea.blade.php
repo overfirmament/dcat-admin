@@ -10,13 +10,13 @@
                   placeholder="{{ $placeholder }}" {!! $attributes !!} >{{ $value }}</textarea>
 
         <span class="help-block">
+            @if($help)
+                <i class="fa {{ \Illuminate\Support\Arr::get($help, 'icon') }}"></i>&nbsp;{!! \Illuminate\Support\Arr::get($help, 'text') !!}
+            @endif
             @php
                 $count = mb_strlen($value);
             @endphp
-            @if($message)
-                <i class="fa feather icon-help-circle"></i>&nbsp;{!! $message !!}
-            @endif
-                <span class="limit_count">({{$count }}/{{$limit}})</span>
+            <span class="limit_count">({{$count }}/{{$limit}})</span>
         </span>
 
     </div>

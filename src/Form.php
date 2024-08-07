@@ -173,6 +173,7 @@ class Form implements Renderable
         'selectTable'         => Field\SelectTable::class,
         'multipleSelectTable' => Field\MultipleSelectTable::class,
         'autocomplete'        => Field\Autocomplete::class,
+        'limitTextarea'       => Field\LimitTextarea::class,
     ];
 
     /**
