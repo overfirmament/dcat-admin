@@ -365,4 +365,9 @@ return [
         // the extension files will be generated in this directory.
         'dir' => base_path('dcat-admin-extensions'),
     ],
+
+    'footer' => [
+        'enable' => true,
+        'content' => 'Powered by <a href="https://dcatadmin.com" target="_blank">Dcat Admin</a> · '.Admin::VERSION,
+    ]
 ];
