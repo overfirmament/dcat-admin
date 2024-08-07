@@ -368,6 +368,6 @@ return [
 
     'footer' => [
         'enable' => true,
-        'content' => 'Powered by <a href="https://dcatadmin.com" target="_blank">Dcat Admin</a> · '.Admin::VERSION,
+        'content' => 'Powered by <a href="https://dcatadmin.com" target="_blank">Dcat Admin</a> · '. \Dcat\Admin\Admin::VERSION,
     ]
 ];
