@@ -12,21 +12,28 @@
         }
     ],
     "require": {
-        "php": ">=8.1.0",
-        "laravel/framework": "~10.0|~11.0|~12.0",
-        "spatie/eloquent-sortable": "3.*|4.*",
-        "doctrine/dbal": "~3.0|~4.0",
+        "php": "^8.2",
+        "laravel/framework": "^12.0|^13.0",
+        "spatie/eloquent-sortable": "^5.0",
         "ext-dom": "*",
         "ext-fileinfo": "*",
         "ext-zip": "*",
         "ext-libxml": "*"
     },
     "require-dev": {
-        "laravel/dusk": "^8.2",
+        "laravel/dusk": "^8.7",
         "phpstan/phpstan": "^2.0",
-        "phpunit/phpunit": "^11.5",
-        "fzaninotto/faker": "^1.5",
-        "mockery/mockery": "^1.6"
+        "phpunit/phpunit": "^11.5|^12.0",
+        "fakerphp/faker": "^1.23",
+        "mockery/mockery": "^1.6",
+        "intervention/image": "^3.11"
+    },
+    "suggest": {
+        "dcat/easy-excel": "Excel export support (optional; verify Laravel 12/13 compatibility)",
+        "intervention/image": "Image handling and thumbnails (Intervention Image v3)",
+        "dcat/laravel-wherehasin": "whereHasIn query optimization (optional)",
+        "dcat/laravel-softdeletes": "Enhanced soft delete support (optional)",
+        "ext-gd": "Required by the Intervention Image GD driver"
     },
     "autoload": {
         "psr-4": {
@@ -38,7 +45,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Dcat\\Admin\\Tests\\": "tests/"
+            "Tests\\": "tests/"
         }
     },
     "scripts": {

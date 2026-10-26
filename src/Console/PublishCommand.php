@@ -5,11 +5,6 @@ namespace Dcat\Admin\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use League\Flysystem\Adapter\Local as LocalAdapter;
-use League\Flysystem\Filesystem as Flysystem;
-use League\Flysystem\Local\LocalFilesystemAdapter;
-use League\Flysystem\MountManager;
 
 class PublishCommand extends Command
 {
@@ -146,44 +141,42 @@ class PublishCommand extends Command
 
     protected function publishDirectory($from, $to)
     {
-        $localClass = class_exists(LocalAdapter::class) ? LocalAdapter::class : LocalFilesystemAdapter::class;
+        $this->createParentDirectory($to);
 
-        $this->moveManagedFiles(new MountManager([
-            'from' => new Flysystem(new $localClass($from)),
-            'to' => new Flysystem(new $localClass($to)),
-        ]));
+        foreach ($this->files->allFiles($from) as $file) {
+            $relativePath = str_replace('\\', '/', $file->getRelativePathname());
+            $target = rtrim($to, '/\\').DIRECTORY_SEPARATOR.$relativePath;
+
+            if ($this->shouldSkipPath($target, $relativePath)) {
+                continue;
+            }
+
+            $this->createParentDirectory(dirname($target));
+
+            $this->files->copy($file->getPathname(), $target);
+        }
 
         $this->status($from, $to, 'Directory');
     }
 
-    protected function moveManagedFiles(MountManager $manager)
+    protected function shouldSkipPath($target, $relativePath)
     {
-        if (method_exists($manager, 'put')) {
-            foreach ($manager->listContents('from://', true) as $file) {
-                if (
-                    $file['type'] === 'file'
-                    && (! $manager->has('to://'.$file['path']) || $this->option('force'))
-                    && ! $this->isExceptPath($manager, $file['path'])
-                ) {
-                    $manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
-                }
-            }
-
-            return;
+        if (! $this->files->exists($target)) {
+            return false;
         }
 
-        foreach ($manager->listContents('from://', true) as $file) {
-            $path = Str::after($file['path'], 'from://');
-
-            if ($file['type'] === 'file' && (! $manager->fileExists('to://'.$path) || $this->option('force'))) {
-                $manager->write('to://'.$path, $manager->read($file['path']));
-            }
+        if ($this->isExceptPath($relativePath)) {
+            return true;
         }
+
+        return ! $this->option('force');
     }
 
-    protected function isExceptPath($manager, $path)
+    protected function isExceptPath($path)
     {
-        return $manager->has('to://'.$path) && Str::contains($path, ['/menu.php', '/global.php']);
+        $segments = explode('/', $path);
+
+        return in_array('menu.php', $segments, true) || in_array('global.php', $segments, true);
     }
 
     protected function createParentDirectory($directory)

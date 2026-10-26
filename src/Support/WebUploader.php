@@ -21,11 +21,36 @@ class WebUploader
 
     public $temporaryDirectory = 'tmp';
 
+    /**
+     * @var string|null
+     */
+    public $_id;
+
+    /**
+     * @var int|null
+     */
+    public $chunk;
+
+    /**
+     * @var int|null
+     */
+    public $chunks;
+
+    /**
+     * @var string|null
+     */
+    public $upload_column;
+
+    /**
+     * @var UploadedFile|null
+     */
+    public $file;
+
     protected $temporaryFilePath;
 
     protected $completeFile;
 
-    public function __construct(Request $request = null)
+    public function __construct(?Request $request = null)
     {
         $request = $this->prepareRequest($request ?: request());
 
@@ -189,13 +214,13 @@ class WebUploader
      * @param  string  $tmpDir
      * @param  string  $newFilename
      */
-    protected function putTempFileContent($path, $tmpDir, $newFileame)
+    protected function putTempFileContent($path, $tmpDir, $newFilename)
     {
         $out = fopen($path, 'wb');
 
         if (flock($out, LOCK_EX)) {
             for ($index = 0; $index < $this->chunks; $index++) {
-                $partPath = "{$tmpDir}/{$newFileame}.{$index}.part";
+                $partPath = "{$tmpDir}/{$newFilename}.{$index}.part";
                 if (! $in = @fopen($partPath, 'rb')) {
                     break;
                 }

@@ -51,8 +51,10 @@ class Application
         return array_filter($this->getApps());
     }
 
-    public function switch(string $app = null)
+    public function switch(?string $app = null)
     {
+        $app = $app ?: static::DEFAULT;
+
         $this->withName($app);
 
         $this->withConfig($this->name);

@@ -49,7 +49,20 @@ trait MenuCache
      */
     public function enableCache()
     {
-        return config('admin.menu.cache.enable');
+        if (! config('admin.menu.cache.enable')) {
+            return false;
+        }
+
+        // Laravel 13 restricts unserializing objects from cache by default.
+        // The menu cache stores Eloquent models, so disable it unless the
+        // application explicitly allows those classes.
+        $serializableClasses = config('cache.serializable_classes');
+
+        if (config()->has('cache.serializable_classes') && ($serializableClasses === false || $serializableClasses === [])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

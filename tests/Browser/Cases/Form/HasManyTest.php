@@ -3,6 +3,7 @@
 namespace Tests\Browser\Cases\Form;
 
 use Laravel\Dusk\Browser;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\Browser\Pages\PainterCreatePage;
 use Tests\Browser\Pages\PainterEditPage;
 use Tests\Models\Painter;
@@ -11,9 +12,8 @@ use Tests\TestCase;
 
 /**
  * 一对多表单功能测试.
- *
- * @group form:has-many
  */
+#[Group('form:has-many')]
 class HasManyTest extends TestCase
 {
     /**

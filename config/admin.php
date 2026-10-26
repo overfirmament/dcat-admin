@@ -270,6 +270,11 @@ return [
             'file'  => 'files',
         ],
 
+        // Intervention Image driver: "gd" or "imagick".
+        'image' => [
+            'driver' => 'gd',
+        ],
+
     ],
 
     /*

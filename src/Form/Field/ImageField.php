@@ -4,9 +4,7 @@ namespace Dcat\Admin\Form\Field;
 
 use Dcat\Admin\Exception\AdminException;
 use Illuminate\Support\Str;
-use Intervention\Image\Constraint;
-use Intervention\Image\Facades\Image as InterventionImage;
-use Intervention\Image\ImageManagerStatic;
+use Intervention\Image\ImageManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 trait ImageField
@@ -43,25 +41,119 @@ trait ImageField
      * Execute Intervention calls.
      *
      * @param  string  $target
-     * @param  string  $mime
+     * @param  string|null  $mime
      * @return mixed
      */
-    public function callInterventionMethods($target, $mime)
+    public function callInterventionMethods($target, $mime = null)
     {
-        if (! empty($this->interventionCalls)) {
-            $image = ImageManagerStatic::make($target);
-
-            $mime = $mime ?: finfo_file(finfo_open(FILEINFO_MIME_TYPE), $target);
-
-            foreach ($this->interventionCalls as $call) {
-                call_user_func_array(
-                    [$image, $call['method']],
-                    $call['arguments']
-                )->save($target, null, $mime);
-            }
+        if (empty($this->interventionCalls)) {
+            return $target;
         }
 
+        $image = $this->imageManager()->read($target);
+
+        foreach ($this->interventionCalls as $call) {
+            $this->applyInterventionCall($image, $call['method'], $call['arguments']);
+        }
+
+        $image->save($target);
+
         return $target;
+    }
+
+    /**
+     * @return \Intervention\Image\ImageManager
+     */
+    protected function imageManager()
+    {
+        return config('admin.upload.image.driver') === 'imagick'
+            ? ImageManager::imagick()
+            : ImageManager::gd();
+    }
+
+    /**
+     * Apply a v2 style image operation through the v3 API.
+     *
+     * @param  \Intervention\Image\Interfaces\ImageInterface  $image
+     * @param  string  $method
+     * @param  array  $arguments
+     * @return void
+     */
+    protected function applyInterventionCall($image, $method, array $arguments)
+    {
+        // v2 constraint callbacks are not part of the v3 API. Only strip
+        // them for methods that accepted such callbacks in v2; v3 drawing
+        // and text methods still accept callables.
+        $hasConstraint = false;
+
+        if (in_array($method, ['resize', 'fit', 'widen', 'heighten'], true)) {
+            foreach ($arguments as $argument) {
+                if ($argument instanceof \Closure) {
+                    $hasConstraint = true;
+                    break;
+                }
+            }
+
+            $arguments = array_values(array_filter($arguments, function ($argument) {
+                return ! $argument instanceof \Closure;
+            }));
+        }
+
+        switch ($method) {
+            case 'fit':
+                $position = $arguments[3] ?? $arguments[2] ?? 'center';
+                $image->cover($arguments[0], $arguments[1], is_string($position) ? $position : 'center');
+                return;
+
+            case 'widen':
+                $image->scale($arguments[0], null);
+                return;
+
+            case 'heighten':
+                $image->scale(null, $arguments[0]);
+                return;
+
+            case 'resize':
+                // In v2 a resize callback commonly meant "keep aspect ratio".
+                if ($hasConstraint || count($arguments) < 2) {
+                    $image->scale($arguments[0] ?? null, $arguments[1] ?? null);
+                } else {
+                    $image->resize($arguments[0], $arguments[1]);
+                }
+                return;
+
+            case 'insert':
+                if (! method_exists($image, 'place')) {
+                    break;
+                }
+
+                $image->place(...$arguments);
+                return;
+
+            case 'orientate':
+                if (! method_exists($image, 'orient')) {
+                    break;
+                }
+
+                $image->orient();
+                return;
+
+            case 'limitColors':
+                if (! method_exists($image, 'reduceColors')) {
+                    break;
+                }
+
+                $image->reduceColors(...$arguments);
+                return;
+        }
+
+        if (! method_exists($image, $method)) {
+            throw new AdminException(
+                "Intervention Image v3 does not support [{$method}]. Please use the v3 API instead."
+            );
+        }
+
+        $image->{$method}(...$arguments);
     }
 
     /**
@@ -79,8 +171,8 @@ trait ImageField
             return parent::__call($method, $arguments);
         }
 
-        if (! class_exists(ImageManagerStatic::class)) {
-            throw new AdminException('To use image handling and manipulation, please install [intervention/image] first.');
+        if (! class_exists(ImageManager::class)) {
+            throw new AdminException('To use image handling and manipulation, please install [intervention/image] v3 first.');
         }
 
         $this->interventionCalls[] = [
@@ -93,11 +185,11 @@ trait ImageField
 
     /**
      * @param  string|array  $name
-     * @param  int  $width
-     * @param  int  $height
+     * @param  int|null  $width
+     * @param  int|null  $height
      * @return $this
      */
-    public function thumbnail($name, int $width = null, int $height = null)
+    public function thumbnail($name, ?int $width = null, ?int $height = null)
     {
         if (func_num_args() == 1 && is_array($name)) {
             foreach ($name as $key => $size) {
@@ -117,7 +209,7 @@ trait ImageField
      *
      * @param  string|array  $file
      * @param  bool  $force
-     * @return void.
+     * @return void
      */
     public function destroyThumbnail($file = null, bool $force = false)
     {
@@ -172,19 +264,32 @@ trait ImageField
             // We merge original name + thumbnail name + extension
             $path = $path.'-'.$name.'.'.$ext;
 
-            /** @var \Intervention\Image\Image $image */
-            $image = InterventionImage::make($file);
+            $image = $this->imageManager()->read($file->getRealPath());
 
             $action = $size[2] ?? 'resize';
-            // Resize image with aspect ratio
-            $image->$action($size[0], $size[1], function (Constraint $constraint) {
-                $constraint->aspectRatio();
-            });
+            $width = $size[0] ?? null;
+            $height = $size[1] ?? null;
+
+            // Keep the v2 thumbnail behavior: resize within the given box
+            // while preserving the aspect ratio.
+            if ($action === 'resize') {
+                $image->scaleDown($width, $height);
+            } elseif ($action === 'fit') {
+                $image->cover($width, $height);
+            } elseif (method_exists($image, $action)) {
+                $image->{$action}($width, $height);
+            } else {
+                throw new AdminException(
+                    "Intervention Image v3 does not support thumbnail action [{$action}]."
+                );
+            }
+
+            $encoded = $image->encodeByPath($path);
 
             if (! is_null($this->storagePermission)) {
-                $this->getStorage()->put("{$this->getDirectory()}/{$path}", $image->encode()->stream(), $this->storagePermission);
+                $this->getStorage()->put("{$this->getDirectory()}/{$path}", $encoded->toFilePointer(), $this->storagePermission);
             } else {
-                $this->getStorage()->put("{$this->getDirectory()}/{$path}", $image->encode()->stream());
+                $this->getStorage()->put("{$this->getDirectory()}/{$path}", $encoded->toFilePointer());
             }
         }
 

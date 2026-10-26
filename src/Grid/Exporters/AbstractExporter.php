@@ -30,6 +30,11 @@ abstract class AbstractExporter implements ExporterInterface
     protected $builder;
 
     /**
+     * @var \Illuminate\Support\Collection|null
+     */
+    protected $modelQueries;
+
+    /**
      * @var array
      */
     protected $titles = [];
@@ -318,7 +323,7 @@ abstract class AbstractExporter implements ExporterInterface
     /**
      * Create a new exporter instance.
      *
-     * @param  \Closure|array  $closure
+     * @param  \Closure|array|null  $builder
      */
     public static function make($builder = null)
     {

@@ -103,8 +103,6 @@ class Layout
         $this->hasBlock = true;
 
         $this->column($width, function (Column $column) use ($callback) {
-            $this->form->layoutColumn = $column;
-
             $column->row(function (\Dcat\Admin\Layout\Row $row) use ($callback) {
                 $form = $this->form();
 
@@ -132,7 +130,7 @@ class Layout
      * @param  \Closure|null  $callback
      * @return BlockForm
      */
-    public function form(\Closure $callback = null)
+    public function form(?\Closure $callback = null)
     {
         $form = new Form\BlockForm($this->form);
 

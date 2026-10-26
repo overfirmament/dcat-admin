@@ -22,7 +22,7 @@ class MigrationCreator extends BaseMigrationCreator
      */
     public function __construct(Filesystem $files)
     {
-        $this->files = $files;
+        parent::__construct($files, null);
     }
 
     /**

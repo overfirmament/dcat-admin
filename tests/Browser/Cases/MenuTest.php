@@ -4,6 +4,7 @@ namespace Tests\Browser\Cases;
 
 use Dcat\Admin\Models\Menu;
 use Laravel\Dusk\Browser;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\Browser\Components\Form\Field\MultipleSelect2;
 use Tests\Browser\Components\Form\Field\Select2;
 use Tests\Browser\Components\Form\MenuEditForm;
@@ -13,9 +14,8 @@ use Tests\TestCase;
 
 /**
  * 菜单管理功能测试.
- *
- * @group menu
  */
+#[Group('menu')]
 class MenuTest extends TestCase
 {
     public function testMenuIndex()

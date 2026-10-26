@@ -11,10 +11,10 @@
     <a href="https://styleci.io/repos/182349597">
         <img src="https://github.styleci.io/repos/182349597/shield" alt="StyleCI">
     </a>
-    <a href="https://packagist.org/packages/dcat/laravel-admin" ><img src="https://poser.pugx.org/dcat/laravel-admin/v/stable" /></a> 
-    <a href="https://packagist.org/packages/dcat/laravel-admin"><img src="https://img.shields.io/packagist/dt/dcat/laravel-admin.svg?color=" /></a> 
-    <a><img src="https://img.shields.io/badge/php-7.1+-59a9f8.svg?style=flat" /></a> 
-    <a><img src="https://img.shields.io/badge/laravel-5.5+-59a9f8.svg?style=flat" ></a>
+    <a href="https://packagist.org/packages/overfirmament/dcat-admin" ><img src="https://poser.pugx.org/overfirmament/dcat-admin/v/stable" /></a>
+    <a href="https://packagist.org/packages/overfirmament/dcat-admin"><img src="https://img.shields.io/packagist/dt/overfirmament/dcat-admin.svg?color=" /></a>
+    <a><img src="https://img.shields.io/badge/php-8.2%20~%208.5-59a9f8.svg?style=flat" /></a>
+    <a><img src="https://img.shields.io/badge/laravel-12.x%20%2F%2013.x-59a9f8.svg?style=flat" ></a>
 </p>
 
 <p align=""><code>Dcat Admin</code>是一个基于<a href="https://www.laravel-admin.org/" target="_blank">laravel-admin</a>二次开发而成的后台系统构建工具，只需很少的代码即可快速构建出一个功能完善的高颜值后台系统。内置丰富的后台常用组件，开箱即用，让开发者告别冗杂的HTML代码，对后端开发者非常友好。</p>
@@ -61,17 +61,23 @@
 
 
 ### 环境
- - PHP >= 7.1.0
- - Laravel 5.5.0 ~ 9.*
- - Fileinfo PHP Extension
+ - PHP 8.2 ~ 8.5
+ - Laravel 12.x / 13.x（Laravel 13 需要 PHP >= 8.3）
+ - PHP 扩展：fileinfo、dom、zip、libxml
+
+可选依赖：
+
+- 图片处理与缩略图：`intervention/image` v3（需要 GD 或 Imagick 扩展）
+- Excel 导出：`dcat/easy-excel`
+- `whereHasIn` 查询优化：`dcat/laravel-wherehasin`
 
 ### 安装
 
-首先需要安装`laravel`框架，如已安装可以跳过此步骤。如果您是第一次使用`laravel`，请务必先阅读文档 [安装 《Laravel中文文档》](https://learnku.com/docs/laravel/8.x/installation/9354) ！
+首先需要安装`laravel`框架，如已安装可以跳过此步骤。如果您是第一次使用`laravel`，请务必先阅读文档 [安装 《Laravel中文文档》](https://learnku.com/docs/laravel/13.x/installation) ！
 ```bash
-composer create-project --prefer-dist laravel/laravel 项目名称 9.*
+composer create-project --prefer-dist laravel/laravel 项目名称 12.*
 # 或
-composer create-project --prefer-dist laravel/laravel 项目名称
+composer create-project --prefer-dist laravel/laravel 项目名称 13.*
 ```
 
 安装完`laravel`之后需要修改`.env`文件，设置数据库连接设置正确
@@ -91,7 +97,7 @@ DB_PASSWORD=
 ```
 cd {项目名称}
 
-composer require dcat/laravel-admin
+composer require overfirmament/dcat-admin
 ```
 
 然后运行下面的命令来发布资源：

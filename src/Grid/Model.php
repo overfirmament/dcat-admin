@@ -59,6 +59,11 @@ class Model
     protected $data;
 
     /**
+     * @var mixed
+     */
+    protected $model;
+
+    /**
      * @var callable
      */
     protected $builder;
@@ -211,7 +216,7 @@ class Model
      * @param  Collection|array  $data
      * @return LengthAwarePaginator|Paginator
      */
-    public function makePaginator($total, $data, string $url = null)
+    public function makePaginator($total, $data, ?string $url = null)
     {
         if ($this->simple) {
             $paginator = new Paginator($data, $this->getPerPage(), $this->getCurrentPage());

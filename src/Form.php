@@ -283,11 +283,11 @@ class Form implements Renderable
     /**
      * Create a new form instance.
      *
-     * @param  Repository|Model|\Illuminate\Database\Eloquent\Builder|string  $model
-     * @param  \Closure  $callback
-     * @param  Request  $request
+     * @param  Repository|Model|\Illuminate\Database\Eloquent\Builder|string|null  $repository
+     * @param  \Closure|null  $callback
+     * @param  Request|null  $request
      */
-    public function __construct($repository = null, ?Closure $callback = null, Request $request = null)
+    public function __construct($repository = null, ?Closure $callback = null, ?Request $request = null)
     {
         $this->repository = $repository ? Admin::repository($repository) : null;
         $this->callback = $callback;
@@ -738,7 +738,7 @@ class Form implements Renderable
      * @param  array  $updates
      * @return $this|array
      */
-    public function updates(array $updates = null)
+    public function updates(?array $updates = null)
     {
         if ($updates === null) {
             return $this->updates;
@@ -1697,7 +1697,7 @@ class Form implements Renderable
      * @param  Closure  $callback
      * @return bool|void
      */
-    public function inDialog(\Closure $callback = null)
+    public function inDialog(?\Closure $callback = null)
     {
         if (! $callback) {
             return DialogForm::is();
