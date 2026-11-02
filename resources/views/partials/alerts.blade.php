@@ -1,4 +1,4 @@
-@if($error = session()->get('error'))
+@if($error = admin_message_bag(session()->get('error')))
     <div class="alert alert-danger alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4><i class="icon fa fa-ban"></i> &nbsp;{{ \Illuminate\Support\Arr::get($error->get('title'), 0) }}</h4>
@@ -16,7 +16,7 @@
     @endif
 @endif
 
-@if($success = session()->get('success'))
+@if($success = admin_message_bag(session()->get('success')))
     <div class="alert alert-success alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4><i class="icon fa fa-check"></i> &nbsp;{{ \Illuminate\Support\Arr::get($success->get('title'), 0) }}</h4>
@@ -24,7 +24,7 @@
     </div>
 @endif
 
-@if($info = session()->get('info'))
+@if($info = admin_message_bag(session()->get('info')))
     <div class="alert alert-info alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4><i class="icon fa fa-info"></i> &nbsp;{{ \Illuminate\Support\Arr::get($info->get('title'), 0) }}</h4>
@@ -32,7 +32,7 @@
     </div>
 @endif
 
-@if($warning = session()->get('warning'))
+@if($warning = admin_message_bag(session()->get('warning')))
     <div class="alert alert-warning alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4><i class="icon fa fa-warning"></i> &nbsp;{{ \Illuminate\Support\Arr::get($warning->get('title'), 0) }}</h4>

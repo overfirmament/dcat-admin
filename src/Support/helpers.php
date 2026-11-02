@@ -306,9 +306,11 @@ if (! function_exists('admin_toastr')) {
      */
     function admin_toastr($message = '', $type = 'success', $options = [])
     {
-        $toastr = new MessageBag(get_defined_vars());
-
-        session()->flash('dcat-admin-toastr', $toastr);
+        session()->flash('dcat-admin-toastr', [
+            'message' => $message,
+            'type'    => $type,
+            'options' => $options,
+        ]);
     }
 }
 
@@ -361,9 +363,35 @@ if (! function_exists('admin_info')) {
      */
     function admin_info($title, $message = '', $type = 'info')
     {
-        $message = new MessageBag(get_defined_vars());
+        session()->flash($type, [
+            'title'   => $title,
+            'message' => $message,
+            'type'    => $type,
+        ]);
+    }
+}
 
-        session()->flash($type, $message);
+if (! function_exists('admin_message_bag')) {
+    /**
+     * Normalize a flashed session message to a MessageBag.
+     *
+     * Laravel's JSON session serialization stores MessageBag instances as
+     * arrays, so views must accept both forms.
+     *
+     * @param  mixed  $message
+     * @return \Illuminate\Support\MessageBag|null
+     */
+    function admin_message_bag($message)
+    {
+        if ($message instanceof MessageBag) {
+            return $message;
+        }
+
+        if (is_array($message) && $message !== []) {
+            return new MessageBag($message);
+        }
+
+        return null;
     }
 }
 

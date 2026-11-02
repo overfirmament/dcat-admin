@@ -17,7 +17,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 
 class ScaffoldController extends Controller
@@ -275,10 +274,10 @@ class ScaffoldController extends Controller
 
     protected function backWithException(\Exception $exception)
     {
-        $error = new MessageBag([
+        $error = [
             'title'   => 'Error',
             'message' => $exception->getMessage(),
-        ]);
+        ];
 
         return redirect()->refresh()->withInput()->with(compact('error'));
     }
@@ -293,10 +292,10 @@ class ScaffoldController extends Controller
 
         $messages[] = "<br />$message";
 
-        $success = new MessageBag([
+        $success = [
             'title'   => 'Success',
             'message' => implode('<br />', $messages),
-        ]);
+        ];
 
         return redirect()->refresh()->with(compact('success'));
     }

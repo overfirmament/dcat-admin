@@ -350,6 +350,9 @@ class JsonResponse implements Arrayable
     /**
      * Flash a piece of data to the session.
      *
+     * Only scalar and array values are safe when the application enables
+     * Laravel's JSON session serialization.
+     *
      * @param  string|array  $key
      * @param  mixed  $value
      * @return $this
