@@ -175,7 +175,7 @@ class UserController extends AdminController
         $form->text('username');
         $form->email('email')->rules('required');
         $form->mobile('mobile');
-        $form->image('avatar')->help('上传头像', 'fa-image');
+        $form->image('avatar')->resize(100, 100)->help('上传头像', 'fa-image');
         $form->ignore(['password_confirmation']);
         $form->password('password')->rules('confirmed');
         $form->password('password_confirmation');
