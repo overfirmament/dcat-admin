@@ -10,6 +10,7 @@ class Text extends Field
 {
     use PlainInput;
     use Sizeable;
+    use ValidatesLength;
 
     public function __construct($column, $arguments = [])
     {
@@ -85,52 +86,6 @@ class Text extends Field
         ];
 
         return $this->attribute($attributes);
-    }
-
-    /**
-     * @param  int  $length
-     * @param  string|null  $error
-     * @return $this
-     */
-    public function minLength(int $length, ?string $error = null)
-    {
-        $this->rules('nullable|min:'.$length);
-
-        return $this->attribute([
-            'data-minlength'       => $length,
-            'data-minlength-error' => str_replace(
-                [':attribute', ':min'],
-                [$this->label, $length],
-                $error ?: trans('admin.validation.minlength')
-            ),
-        ]);
-    }
-
-    /**
-     * @param  int  $length
-     * @param  string|null  $error
-     * @return $this
-     */
-    public function maxLength(int $length, ?string $error = null)
-    {
-        Admin::script(
-            <<<'JS'
-Dcat.validator.extend('maxlength', function ($el) {
-    return $el.val().length > $el.attr('data-maxlength');
-});
-JS
-        );
-
-        $this->rules('max:'.$length);
-
-        return $this->attribute([
-            'data-maxlength'       => $length,
-            'data-maxlength-error' => str_replace(
-                [':attribute', ':max'],
-                [$this->label, $length],
-                $error ?: trans('admin.validation.maxlength')
-            ),
-        ]);
     }
 
     /**

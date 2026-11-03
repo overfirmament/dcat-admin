@@ -2,57 +2,40 @@
 
 namespace Dcat\Admin\Form\Field;
 
-use Dcat\Admin\Admin;
 
 class LimitTextarea extends Textarea
 {
-    protected $view = "admin::form.limit-textarea";
+    use ValidatesLength;
 
-    protected ?string $message = "";
-
-    protected int $limit = 200;
-
-    public function render()
-    {
-        $this->addVariables([
-            'message' => $this->message,
-            'limit' => $this->limit,
-        ]);
-
-        return parent::render();
-    }
-
+    protected $view = 'admin::form.limit-textarea';
 
     /**
-     * @param  int  $length
-     * @param  string|null  $error
+     * Default maximum number of characters.
      *
-     * @return LimitTextarea
+     * @var int
      */
-    public function maxLength(int $length, ?string $error = null)
+    protected int $defaultLimit = 200;
+
+    /**
+     * @param  string|array  $column
+     * @param  array  $arguments
+     */
+    public function __construct($column, $arguments = [])
     {
-        $this->limit = $length;
+        parent::__construct($column, $arguments);
 
-        Admin::script(
-            <<<'JS'
-    Dcat.validator.extend('maxlength', function ($el) {
-    return $el.val().length > $el.attr('data-maxlength');
-});
-JS
-        );
+        if (! $this->lengthLimitConfigured) {
+            $this->maxLength($this->defaultLimit);
+        }
+    }
 
-        $originalMessages = $this->validationMessages["default"] ?? [];
-        $messages = array_merge($originalMessages, ["max" => "最多输入{$length}个字符"]);
-
-        $this->rules('max:'.$length, $messages);
-
-        return $this->attribute([
-            'data-maxlength'       => $length,
-            'data-maxlength-error' => str_replace(
-                [':attribute', ':max'],
-                [$this->label, $length],
-                $error ?: trans('admin.validation.maxlength')
-            ),
+    /**
+     * {@inheritdoc}
+     */
+    public function defaultVariables()
+    {
+        return array_merge(parent::defaultVariables(), [
+            'limit' => (int) ($this->getAttribute('data-maxlength') ?: $this->defaultLimit),
         ]);
     }
 }

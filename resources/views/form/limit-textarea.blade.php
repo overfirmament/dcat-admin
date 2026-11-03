@@ -13,22 +13,21 @@
             @if($help)
                 <i class="fa {{ \Illuminate\Support\Arr::get($help, 'icon') }}"></i>&nbsp;{!! \Illuminate\Support\Arr::get($help, 'text') !!}
             @endif
-            @php
-                $count = mb_strlen($value);
-            @endphp
-            <span class="limit_count">({{$count }}/{{$limit}})</span>
+            <span class="limit_count" aria-live="polite">({{ mb_strlen((string) $value) }}/{{ $limit }})</span>
         </span>
 
     </div>
 </div>
 
-<script init="{!! $selector !!}" >
-    $('#'+id).on('input', function () {
-        var length = $(this).val().length;
-        var lengthText = length;
-        if (length > {{$limit}}) {
-            lengthText = '<font color="red">'+ length + '<\/font>';
-        }
-        $('#'+id).siblings('span.help-block').find('.limit_count').html("("+lengthText+"/{{$limit}})")
+<script init="{!! $selector !!}">
+    $this.on('input', function () {
+        var length = Array.from($this.val() || '').length;
+        var lengthText = length > {{ $limit }}
+            ? '<span class="text-danger">' + length + '</span>'
+            : length;
+
+        $this.siblings('span.help-block')
+            .find('.limit_count')
+            .html('(' + lengthText + '/{{ $limit }})');
     });
 </script>

@@ -185,7 +185,7 @@ class UserController extends AdminController
         $form->text('profile.first_name');
         $form->text('profile.last_name');
         $form->text('profile.postcode')->help('Please input your postcode');
-        $form->textarea('profile.address')->rows(15);
+        $form->limitTextarea('profile.address')->rows(15)->maxLength(10);
         //$form->map('profile.latitude', 'profile.longitude', 'Position');
         $form->text('profile.color');
         $form->datetime('profile.start_at');
